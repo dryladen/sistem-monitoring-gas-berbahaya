@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>{{ $title }}</title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icon-ayam.png">
+    <link rel="icon"  type="image/png" sizes="16x16" href="/assets/images/icon-ayam.png">
     <!-- Custom Stylesheet -->
     <link href="/assets/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/5.0.7/sweetalert2.min.css" rel="stylesheet">
@@ -113,20 +113,17 @@
                     </li>
                     <li class="nav-label">Data</li>
                     <li>
-                        <a href="/setdiskon" aria-expanded="false">
+                        <a href="/riwayat_monitoring" aria-expanded="false">
                             <i class="fa fa-history" aria-hidden="true"></i> <span class="nav-text">Riwayat Monitoring</span>
                         </a>
                     </li>
-                    <li class="mega-menu mega-menu-sm">
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="fa fa-folder" aria-hidden="true"></i><span class="nav-text">Data Master</span>
+                    <li>
+                        <a href="/user" aria-expanded="false">
+                            <i class="fa fa-user" aria-hidden="true"></i> <span class="nav-text"> Data User</span>
                         </a>
-                        <ul aria-expanded="false">
-                            <li><a href="/user">Data User</a></li>
-                        </ul>
                     </li>
                     <li>
-                        <a href="/transaksi" aria-expanded="false">
+                        <a href="/logout" aria-expanded="false">
                             <i class="icon-logout"></i><span class="nav-text">Keluar</span>
                         </a>
                     </li>

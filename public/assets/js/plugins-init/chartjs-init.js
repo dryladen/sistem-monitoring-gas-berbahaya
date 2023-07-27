@@ -3,7 +3,7 @@
 
     //Sales chart
     var ctx = document.getElementById("sales-chart");
-    ctx.height = 150;
+    ctx.height = 100;
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -14,12 +14,12 @@
                 label: "Amonia",
                 data: [0, 10, 20, 10, 25, 15, 150],
                 backgroundColor: 'transparent',
-                borderColor: '#7571F9',
+                borderColor: '#ee609c',
                 borderWidth: 3,
                 pointStyle: 'circle',
                 pointRadius: 5,
                 pointBorderColor: 'transparent',
-                pointBackgroundColor: '#7571F9',
+                pointBackgroundColor: '#ee609c',
 
             }, {
                 label: "Metana",
@@ -27,7 +27,7 @@
                 backgroundColor: 'transparent',
                 borderColor: '#4d7cff',
                 borderWidth: 3,
-                pointStyle: 'circle',
+                pointStyle: 'triangle',
                 pointRadius: 5,
                 pointBorderColor: 'transparent',
                 pointBackgroundColor: '#4d7cff',
@@ -35,7 +35,6 @@
         },
         options: {
             responsive: true,
-
             tooltips: {
                 mode: 'index',
                 titleFontSize: 12,
@@ -62,7 +61,7 @@
                     },
                     scaleLabel: {
                         display: false,
-                        labelString: 'Month'
+                        labelString: 'Waktu'
                     }
                 }],
                 yAxes: [{
