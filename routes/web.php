@@ -30,4 +30,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/user/store',[UserController::class,'store']);
     Route::post('/user/update/{id}',[UserController::class,'update']);
     Route::get('/user/delete/{id}',[UserController::class,'destroy']);
+
+    // Setting profike
+    Route::get('/profile',[UserController::class,'profile']);
+    Route::post('/profile/updateProfile/{id}',[UserController::class,'updateProfile']);
 });

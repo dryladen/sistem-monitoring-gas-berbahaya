@@ -93,7 +93,7 @@
                             <select name="role" class="form-control" required>
                                 <option value="" hidden>-- Pilih Role --</option>
                                 <option value="admin">Admin</option>
-                                <option value="kasir">Kasir</option>
+                                <option value="peternak">Peternak</option>
                             </select>
                         </div>
                     </div>
