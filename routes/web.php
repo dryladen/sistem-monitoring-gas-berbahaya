@@ -23,8 +23,10 @@ Route::post('/', [HomeController::class, 'login']);
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [HomeController::class, 'logout']);
     Route::get('/home', [HomeController::class, 'home']);
-    Route::get('/riwayat_monitoring', [FuzzyController::class, 'index']);
-
+    Route::get('/riwayat_monitoring', [HomeController::class, 'riwayat_monitoring']);
+    
+    // Fuzzy 
+    Route::get('/fuzzy', [FuzzyController::class, 'index']);
     // Crud data user
     Route::get('/user',[UserController::class,'index']);
     Route::post('/user/store',[UserController::class,'store']);

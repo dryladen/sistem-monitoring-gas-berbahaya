@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DataGas extends Model
+class DataFuzzy extends Model
 {
     use HasFactory;
 
-    protected $table = 'tbl_data_gas';
+    protected $table = 'tbl_range_fuzzy';
 
     protected $fillable = [
-        'gas_amonia',
-        'gas_metana',
+        'id_variabel',
+        'a',
+        'b',
+        'c',
     ];
 
     const CREATED_AT = 'created_at';

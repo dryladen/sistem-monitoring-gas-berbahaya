@@ -19,6 +19,12 @@ class HomeController extends Controller
         );
         return view('dashboard',$data);
     }
+    public function riwayat_monitoring(){
+        $data = array(
+            'title' => 'Riwayat Monitoring',
+        );
+        return view('riwayat_monitoring',$data);
+    }
     public function login(Request $request)
     {
         $request->validate([

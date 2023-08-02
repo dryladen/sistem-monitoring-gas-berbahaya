@@ -123,6 +123,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/fuzzy" aria-expanded="false">
+                            <i class="fa fa-user" aria-hidden="true"></i> <span class="nav-text"> Data Fuzzy</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/logout" aria-expanded="false">
                             <i class="icon-logout"></i><span class="nav-text">Keluar</span>
                         </a>

@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_aturan_fuzzy', function (Blueprint $table) {
+        Schema::create('tbl_variabel_fuzzy', function (Blueprint $table) {
             $table->id();
-            $table->float('premis1')->nullable();
-            $table->float('premis2')->nullable();
-            $table->float('konklusi')->nullable();
+            $table->string('tipe')->nullable();
+            $table->string('variabel')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_aturan_fuzzy');
+        Schema::dropIfExists('tbl_variabel_fuzzy');
     }
 };
