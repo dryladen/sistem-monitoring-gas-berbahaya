@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('tbl_aturan_fuzzy', function (Blueprint $table) {
             $table->id();
-            $table->float('variabel1')->nullable();
-            $table->float('variabel2')->nullable();
-            $table->float('konklusi')->nullable();
+            $table->string('variabel1')->nullable();
+            $table->string('variabel2')->nullable();
+            $table->string('konklusi')->nullable();
             $table->timestamps();
         });
     }
