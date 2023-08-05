@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataGas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,6 +23,7 @@ class HomeController extends Controller
     public function riwayat_monitoring(){
         $data = array(
             'title' => 'Riwayat Monitoring',
+            'data_gas' => DataGas::all(),
         );
         return view('riwayat_monitoring',$data);
     }
