@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>{{ $title }}</title>
     <!-- Favicon icon -->
-    <link rel="icon"  type="image/png" sizes="16x16" href="/assets/images/icon-ayam.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icon-ayam.png">
     <!-- Custom Stylesheet -->
     <link href="/assets/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/5.0.7/sweetalert2.min.css" rel="stylesheet">
@@ -114,14 +114,17 @@
                     <li class="nav-label">Data</li>
                     <li>
                         <a href="/riwayat_monitoring" aria-expanded="false">
-                            <i class="fa fa-history" aria-hidden="true"></i> <span class="nav-text">Riwayat Monitoring</span>
+                            <i class="fa fa-history" aria-hidden="true"></i> <span class="nav-text">Riwayat
+                                Monitoring</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="/user" aria-expanded="false">
-                            <i class="fa fa-user" aria-hidden="true"></i> <span class="nav-text"> Data User</span>
-                        </a>
-                    </li>
+                    @if (Auth::user()->role == 'admin')
+                        <li>
+                            <a href="/user" aria-expanded="false">
+                                <i class="fa fa-user" aria-hidden="true"></i> <span class="nav-text"> Data User</span>
+                            </a>
+                        </li>
+                    @endif
                     <li>
                         <a href="/fuzzy" aria-expanded="false">
                             <i class="fa fa-user" aria-hidden="true"></i> <span class="nav-text"> Data Fuzzy</span>
@@ -173,7 +176,7 @@
     <script src="/assets/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
     <script src="/assets/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
     <script src="/assets/plugins/chart.js/Chart.bundle.min.js"></script>
-    <script src="/assets/js/plugins-init/chartjs-init.js"></script>
+    {{-- <script src="/assets/js/plugins-init/chartjs-init.js"></script> --}}
 
     @if (session('success'))
         <script>
@@ -195,13 +198,13 @@
                     });
                 };
                 return {
-                    init: function(){
+                    init: function() {
                         initDemo();
                     },
                 };
             }();
 
-            jQuery(document).ready(function(){
+            jQuery(document).ready(function() {
                 sweetAlertDemo.init();
             });
         </script>
@@ -226,18 +229,18 @@
                     });
                 };
                 return {
-                    init: function(){
+                    init: function() {
                         initDemo();
                     },
                 };
             }();
 
-            jQuery(document).ready(function(){
+            jQuery(document).ready(function() {
                 sweetAlertDemo.init();
             });
         </script>
     @endif
-
+    @yield('scripts')
 </body>
 
 </html>

@@ -8,24 +8,32 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $data = array(
             'title' => 'Halaman Login',
         );
-        return view('index',$data);
+        return view('index', $data);
     }
-    public function home(){
+    public function home()
+    {
+        // DataGas::create([
+        //     "amonia" => 1,
+        //     "metana" => 2
+        // ]);
         $data = array(
             'title' => 'Dashboard',
         );
-        return view('dashboard',$data);
+        return view('dashboard', $data);
     }
-    public function riwayat_monitoring(){
+    
+    public function riwayat_monitoring()
+    {
         $data = array(
             'title' => 'Riwayat Monitoring',
             'data_gas' => DataGas::all(),
         );
-        return view('riwayat_monitoring',$data);
+        return view('riwayat_monitoring', $data);
     }
     public function login(Request $request)
     {
@@ -40,13 +48,14 @@ class HomeController extends Controller
             'email' => $request->email,
             'password' => $request->password,
         ];
-        if(Auth::attempt($infoLogin)){
+        if (Auth::attempt($infoLogin)) {
             return redirect('/home');
         } else {
             return redirect('')->withErrors('Email dan Password tidak terdaftar')->withInput();
         }
     }
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
         return redirect('');
     }

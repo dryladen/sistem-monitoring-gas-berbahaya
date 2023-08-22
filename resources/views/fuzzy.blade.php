@@ -60,15 +60,15 @@
                                     <tbody>
                                         <tr>
                                             <td>Amonia</td>
-                                            <td>{{ $derajat_keanggotaan['Amonia']['Rendah'] }}</td>
-                                            <td>{{ $derajat_keanggotaan['Amonia']['Normal'] }}</td>
-                                            <td>{{ $derajat_keanggotaan['Amonia']['Tinggi'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Rendah'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Normal'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Tinggi'] }}</td>
                                         </tr>
                                         <tr>
                                             <td>Metana</td>
-                                            <td>{{ $derajat_keanggotaan['Metana']['Rendah'] }}</td>
-                                            <td>{{ $derajat_keanggotaan['Metana']['Normal'] }}</td>
-                                            <td>{{ $derajat_keanggotaan['Metana']['Tinggi'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Metana']['Rendah'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Metana']['Normal'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Metana']['Tinggi'] }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -104,7 +104,7 @@
                                                 <td>{{ $item->variabel1 }}</td>
                                                 <td>{{ $item->variabel2 }}</td>
                                                 <td>{{ $item->konklusi }}</td>
-                                                <td>{{ $alpa_predikat[$index++] }}</td>
+                                                <td>{{ $fuzzy_mamdani['alpa_predikat'][$index++] }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -129,8 +129,8 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{{ $nilai_keanggotaan['a1'] }}</td>
-                                            <td>{{ $nilai_keanggotaan['a2'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['nilai_keanggotaan']['a1'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['nilai_keanggotaan']['a2'] }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -154,8 +154,8 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="text-center">{{ $deffuzifikasi[1] }}</td>
-                                            <td class="text-center">{{ $deffuzifikasi[0] }}</td>
+                                            <td class="text-center">{{ $fuzzy_mamdani['output'][1] }}</td>
+                                            <td class="text-center">{{ $fuzzy_mamdani['output'][0] }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

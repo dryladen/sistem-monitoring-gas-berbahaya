@@ -23,7 +23,8 @@ Route::post('/', [HomeController::class, 'login']);
 // ! Hanya dapat diakses ketika sudah melakukan login
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [HomeController::class, 'logout']);
-    Route::get('/home', [HomeController::class, 'home']);
+    Route::get('/home', [HomeController::class, 'home'])->name('dashboard');
+    Route::get('/dataGas', [FuzzyController::class, 'dataGas'])->name('dataGas');
     Route::get('/riwayat_monitoring', [HomeController::class, 'riwayat_monitoring']);
     // Fuzzy (Uji coba perhitungan)
     Route::get('/fuzzy', [FuzzyController::class, 'index']);
