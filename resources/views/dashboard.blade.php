@@ -26,7 +26,7 @@
                                 <div class="media">
                                     <span class="card-widget__icon"><i class="icon-fire"></i></span>
                                     <div class="media-body">
-                                        <h2 id="nilai_amonia" class="card-widget__title">15 PPM</h2>
+                                        <h2 id="nilai_amonia" class="card-widget__title">0 PPM</h2>
                                         <h5 class="card-widget__subtitle">Gas Amonia</h5>
                                     </div>
                                 </div>
@@ -112,6 +112,7 @@
                 },
                 success: function(data) {
                     // update data chart
+                    console.log(data)
                     myChart.data.labels = data.labels;
                     myChart.data.datasets[0].data = data.amonia;
                     myChart.data.datasets[1].data = data.metana;
@@ -119,7 +120,7 @@
                     // update data dibawah chart
                     nilai_metana.innerHTML = data.nilai_last_metana;
                     nilai_amonia.innerHTML = data.nilai_last_amonia;
-                    nilai_kondisi.innerHTML = data.nilai_kondisi['output'][0];
+                    nilai_kondisi.innerHTML = data.nilai_kondisi;
                 },
                 error: function(data) {
                     console.log(data);
@@ -130,6 +131,6 @@
         updateChart();
         setInterval(() => {
             updateChart();
-        }, 60000);
+        }, 30000);
     </script>
 @endsection

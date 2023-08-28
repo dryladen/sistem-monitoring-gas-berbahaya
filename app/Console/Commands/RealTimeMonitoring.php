@@ -1,69 +1,39 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Console\Commands;
 
-use App\Models\AturanFuzzy;
 use App\Models\DataFuzzy;
-use App\Models\DataGas;
 use App\Models\OutputFuzzy;
-use Illuminate\Http\Request;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
-class FuzzyController extends Controller
+class RealTimeMonitoring extends Command
 {
-    public function index()
-    {
-        $data = array(
-            "title" => "Himpunan Fuzzy",
-            "data_fuzzy" => DataFuzzy::join("tbl_variabel_fuzzy", "tbl_variabel_fuzzy.id", "=", "tbl_range_fuzzy.id")->select("tbl_range_fuzzy.*", "tbl_variabel_fuzzy.variabel")->get(),
-            "aturan_fuzzy" => AturanFuzzy::all(),
-            "fuzzy_mamdani" => $this->fuzzyMamdani(15, 62)
-        );
-        return view('fuzzy', $data);
-    }
 
-    public function dataGas()
-    {
-        // Mengambil 10 data terakhir
-        $dataGas = DataGas::latest()->take(10)->get()->sortBy('id');
-        $dataGas_last = DataGas::latest()->first();
-        $dates = $dataGas->pluck('created_at');
-        $labels = [];
-        // Konversi waktu dalam bentuk (Jam:Menit)
-        foreach ($dates as $date) {
-            $carbonDate = Carbon::parse($date);
-            $formattedDate = $carbonDate->format('H:i');
-            $labels[] = $formattedDate;
-        }
-        $amonia = $dataGas->pluck('gas_amonia');
-        $metana = $dataGas->pluck('gas_metana');
-        $nilai_last_amonia = $dataGas_last->gas_amonia;
-        $nilai_last_metana = $dataGas_last->gas_metana;
-        $nilai_kondisi = $this->fuzzyMamdani($nilai_last_amonia, $nilai_last_metana);
 
-        
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'RealTimeMonitoring';
 
-        return response()->json(compact('labels', 'amonia', 'metana', 'nilai_last_amonia', 'nilai_last_metana', 'nilai_kondisi'));
-    }
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
 
-    public function saveData()
-    {
-        // Menyimpan hasil ke database tbl_hitung_fuzzy
-        // OutputFuzzy::create([
-        //     'gas_amonia' => $nilai_last_amonia,
-        //     'gas_metana' => $nilai_last_metana,
-        //     'komposisi_aman' => $nilai_kondisi['komposisi_aturan'][0],
-        //     'komposisi_waspada' => $nilai_kondisi['komposisi_aturan'][1],
-        //     'komposisi_bahaya' => $nilai_kondisi['komposisi_aturan'][2],
-        //     'nilai_a1' => $nilai_kondisi['nilai_keanggotaan']['a1'],
-        //     'nilai_a2' => $nilai_kondisi['nilai_keanggotaan']['a2'],
-        //     'output_deff' => $nilai_kondisi['output'][0],
-        //     'kondisi' => $nilai_kondisi['output'][1],
-        // ]);
-    }
+    /**
+     * Execute the console command.
+     */
+
+    //  ! Kodingan perhitungan fuzzy
+
     // ! Fuzifikasi
-    // Fungsi keanggotaan segitiga
+    // ? Fungsi keanggotaan segitiga
     private function fSegitiga($x, $a, $b, $c)
     {
         if ($x <= $a || $x >= $c) {
@@ -77,7 +47,7 @@ class FuzzyController extends Controller
         }
     }
 
-    // Fungsi keanggotaan linear naik
+    // ? Fungsi keanggotaan linear naik
     private function fLinearNaik($x, $a, $b)
     {
         if ($x <= $a) {
@@ -89,7 +59,7 @@ class FuzzyController extends Controller
         }
     }
 
-    // Fungsi keanggotaan linear turun
+    // ? Fungsi keanggotaan linear turun
     private function fLinearTurun($x, $a, $b)
     {
         if ($x <= $a) {
@@ -105,7 +75,7 @@ class FuzzyController extends Controller
     private function fuzzifikasi($data_amonia, $data_metana)
     {
         $variabel_fuzzy = DataFuzzy::all();
-        // Menghitung derajat keanggotaan
+        // ? Menghitung derajat keanggotaan
         $derajat_keanggotaan = array(
             "Amonia" => array(
                 "Rendah" => $this->fSegitiga($data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"], $variabel_fuzzy[0]["c"]),
@@ -206,5 +176,49 @@ class FuzzyController extends Controller
             'output' => $deffuzifikasi
         );
         return $FuzzyMamdani;
+    }
+    private function getData($url)
+    {
+        $headers = [
+            "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXYiOiJLYW5kYW5nQXlhbV9CYW50dWFzIiwiaWF0IjoxNjkyNjgxNTQ5LCJqdGkiOiI2NGU0NDU0ZGE2YTIyNWY3ODAwNzI1YzMiLCJzdnIiOiJhcC1zb3V0aGVhc3QuYXdzLnRoaW5nZXIuaW8iLCJ1c3IiOiJLZWxhc0tpbGF0In0.weXlqGTTwe2PfSYKK-0OBLhQodAmBB9sLiCG1aTvTJc"
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $dataJson = json_decode($response, true);
+        $data = number_format($dataJson, 2);
+
+        return $data;
+    }
+    public function handle()
+    {
+        //Mengambil data dari API
+        $amonia = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/CH4");
+        $metana = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/temp");
+
+        DB::table('tbl_data_gas')->insert([
+            'gas_amonia' => $amonia,
+            'gas_metana' => $metana,
+        ]);
+        // Cmd run schedul : php artisan schedule:work
+        // Ini masih bermasalah menyimpan data ke database
+        // // ! Perhitungan Fuzzy
+        // $dataFuzzy = $this->fuzzyMamdani($amonia, $metana);
+        // // ! Menyimpan Perhitungan ke Database
+        // OutputFuzzy::create([
+        //     'gas_amonia' => $amonia,
+        //     'gas_metana' => $metana,
+        //     'komposisi_aman' => $dataFuzzy['komposisi_aturan'][0],
+        //     'komposisi_waspada' => $dataFuzzy['komposisi_aturan'][1],
+        //     'komposisi_bahaya' => $dataFuzzy['komposisi_aturan'][2],
+        //     'nilai_a1' => $dataFuzzy['nilai_keanggotaan']['a1'],
+        //     'nilai_a2' => $dataFuzzy['nilai_keanggotaan']['a2'],
+        //     'output_deff' => $dataFuzzy['output'][0],
+        //     'kondisi' => $dataFuzzy['output'][1]
+        // ]);
     }
 }

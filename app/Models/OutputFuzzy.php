@@ -9,7 +9,7 @@ class OutputFuzzy extends Model
 {
     use HasFactory;
 
-    protected $table = 'tbl_data_gas';
+    protected $table = 'tbl_hitung_fuzzy';
 
     protected $fillable = [
         'gas_amonia',
@@ -17,8 +17,8 @@ class OutputFuzzy extends Model
         'komposisi_aman',
         'komposisi_waspada',
         'komposisi_bahaya',
-        'nilai_a',
-        'nilai_a',
+        'nilai_a1',
+        'nilai_a2',
         'output_deff',
         'kondisi',
     ];
