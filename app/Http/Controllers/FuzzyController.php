@@ -14,11 +14,13 @@ class FuzzyController extends Controller
 {
     public function index()
     {
+        $dataGas = DataGas::latest()->take(10)->get()->sortBy('id');
+        $dataGas_last = DataGas::latest()->first();
         $data = array(
             "title" => "Himpunan Fuzzy",
             "data_fuzzy" => DataFuzzy::join("tbl_variabel_fuzzy", "tbl_variabel_fuzzy.id", "=", "tbl_range_fuzzy.id")->select("tbl_range_fuzzy.*", "tbl_variabel_fuzzy.variabel")->get(),
             "aturan_fuzzy" => AturanFuzzy::all(),
-            "fuzzy_mamdani" => $this->fuzzyMamdani(15, 62)
+            "fuzzy_mamdani" => $this->fuzzyMamdani(23,18)
         );
         return view('fuzzy', $data);
     }
@@ -42,26 +44,9 @@ class FuzzyController extends Controller
         $nilai_last_metana = $dataGas_last->gas_metana;
         $nilai_kondisi = $this->fuzzyMamdani($nilai_last_amonia, $nilai_last_metana);
 
-        
-
         return response()->json(compact('labels', 'amonia', 'metana', 'nilai_last_amonia', 'nilai_last_metana', 'nilai_kondisi'));
     }
 
-    public function saveData()
-    {
-        // Menyimpan hasil ke database tbl_hitung_fuzzy
-        // OutputFuzzy::create([
-        //     'gas_amonia' => $nilai_last_amonia,
-        //     'gas_metana' => $nilai_last_metana,
-        //     'komposisi_aman' => $nilai_kondisi['komposisi_aturan'][0],
-        //     'komposisi_waspada' => $nilai_kondisi['komposisi_aturan'][1],
-        //     'komposisi_bahaya' => $nilai_kondisi['komposisi_aturan'][2],
-        //     'nilai_a1' => $nilai_kondisi['nilai_keanggotaan']['a1'],
-        //     'nilai_a2' => $nilai_kondisi['nilai_keanggotaan']['a2'],
-        //     'output_deff' => $nilai_kondisi['output'][0],
-        //     'kondisi' => $nilai_kondisi['output'][1],
-        // ]);
-    }
     // ! Fuzifikasi
     // Fungsi keanggotaan segitiga
     private function fSegitiga($x, $a, $b, $c)
@@ -131,7 +116,7 @@ class FuzzyController extends Controller
         return $alpa_predikat;
     }
 
-    private function komposisiAturan($alpa_predikat)
+    private function komposisiAturan($alpa_predikat) // perlu error handling disini ketika terdapat nilai komposisi aturan yang sama 
     {
         $komposisi_aturan = array();
         array_push($komposisi_aturan, max($alpa_predikat[0], $alpa_predikat[1], $alpa_predikat[3]));
@@ -154,6 +139,8 @@ class FuzzyController extends Controller
         $variabel_fuzzy = DB::table('tbl_range_fuzzy')->get();
         $a1 = 0;
         $a2 = 0;
+        print_r($komposisi_aturan);
+        die;
         if ($komposisi_aturan[3] == "Aman") {
             $a1 = $variabel_fuzzy[6]->a  + ($komposisi_aturan[0] * ($variabel_fuzzy[6]->b - $variabel_fuzzy[6]->a));
             $a2 = $variabel_fuzzy[6]->c  - ($komposisi_aturan[0] * ($variabel_fuzzy[6]->c - $variabel_fuzzy[6]->b));

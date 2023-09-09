@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\DataFuzzy;
-use App\Models\OutputFuzzy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -197,8 +196,10 @@ class RealTimeMonitoring extends Command
     public function handle()
     {
         //Mengambil data dari API
-        $amonia = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/CH4");
-        $metana = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/temp");
+        // $amonia = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/CH4");
+        // $metana = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/temp");
+        $amonia = rand(0,25);
+        $metana = rand(0,110);
 
         DB::table('tbl_data_gas')->insert([
             'gas_amonia' => $amonia,
@@ -207,18 +208,18 @@ class RealTimeMonitoring extends Command
         // Cmd run schedul : php artisan schedule:work
         // Ini masih bermasalah menyimpan data ke database
         // // ! Perhitungan Fuzzy
-        // $dataFuzzy = $this->fuzzyMamdani($amonia, $metana);
-        // // ! Menyimpan Perhitungan ke Database
-        // OutputFuzzy::create([
-        //     'gas_amonia' => $amonia,
-        //     'gas_metana' => $metana,
-        //     'komposisi_aman' => $dataFuzzy['komposisi_aturan'][0],
-        //     'komposisi_waspada' => $dataFuzzy['komposisi_aturan'][1],
-        //     'komposisi_bahaya' => $dataFuzzy['komposisi_aturan'][2],
-        //     'nilai_a1' => $dataFuzzy['nilai_keanggotaan']['a1'],
-        //     'nilai_a2' => $dataFuzzy['nilai_keanggotaan']['a2'],
-        //     'output_deff' => $dataFuzzy['output'][0],
-        //     'kondisi' => $dataFuzzy['output'][1]
-        // ]);
+        $dataFuzzy = $this->fuzzyMamdani($amonia, $metana);
+        // // // ! Menyimpan Perhitungan ke Database
+        DB::table('tbl_hitung_fuzzy')->insert([
+            'gas_amonia' => $amonia,
+            'gas_metana' => $metana,
+            'komposisi_aman' => $dataFuzzy['komposisi_aturan'][0],
+            'komposisi_waspada' => $dataFuzzy['komposisi_aturan'][1],
+            'komposisi_bahaya' => $dataFuzzy['komposisi_aturan'][2],
+            'nilai_a1' => $dataFuzzy['nilai_keanggotaan']['a1'],
+            'nilai_a2' => $dataFuzzy['nilai_keanggotaan']['a2'],
+            'output_deff' => $dataFuzzy['output'][1],
+            'kondisi' => $dataFuzzy['output'][0]
+        ]);
     }
 }

@@ -9,6 +9,7 @@
                 </ol>
             </div>
         </div>
+       
         <div class="row">
             <div class="container-fluid">
                 <div class="card">
@@ -120,7 +121,8 @@
                     // update data dibawah chart
                     nilai_metana.innerHTML = data.nilai_last_metana;
                     nilai_amonia.innerHTML = data.nilai_last_amonia;
-                    nilai_kondisi.innerHTML = data.nilai_kondisi;
+                    nilai_kondisi.innerHTML = data.nilai_kondisi['output'][0];
+                    console.log(nilai_kondisi)
                 },
                 error: function(data) {
                     console.log(data);
@@ -131,6 +133,6 @@
         updateChart();
         setInterval(() => {
             updateChart();
-        }, 30000);
+        }, 10000);
     </script>
 @endsection
