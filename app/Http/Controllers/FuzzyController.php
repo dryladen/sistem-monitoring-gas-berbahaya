@@ -5,22 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\AturanFuzzy;
 use App\Models\DataFuzzy;
 use App\Models\DataGas;
-use App\Models\OutputFuzzy;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class FuzzyController extends Controller
 {
     public function index()
     {
-        $dataGas = DataGas::latest()->take(10)->get()->sortBy('id');
-        $dataGas_last = DataGas::latest()->first();
+        // $dataGas = DataGas::latest()->take(10)->get()->sortBy('id');
+        // $dataGas_last = DataGas::latest()->first();
         $data = array(
             "title" => "Himpunan Fuzzy",
             "data_fuzzy" => DataFuzzy::join("tbl_variabel_fuzzy", "tbl_variabel_fuzzy.id", "=", "tbl_range_fuzzy.id")->select("tbl_range_fuzzy.*", "tbl_variabel_fuzzy.variabel")->get(),
             "aturan_fuzzy" => AturanFuzzy::all(),
-            "fuzzy_mamdani" => $this->fuzzyMamdani(23,18)
+            'user' => Auth::user()->name,
+            "fuzzy_mamdani" => $this->fuzzyMamdani(20, 46)
         );
         return view('fuzzy', $data);
     }
@@ -123,14 +123,14 @@ class FuzzyController extends Controller
         array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[5]));
         array_push($komposisi_aturan, max($alpa_predikat[6], $alpa_predikat[7], $alpa_predikat[8]));
 
-        if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] > $komposisi_aturan[2]) {
+        if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] >= $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Aman");
-        } else if ($komposisi_aturan[1] > $komposisi_aturan[0] && $komposisi_aturan[1] > $komposisi_aturan[2]) {
+        } else if ($komposisi_aturan[1] > $komposisi_aturan[0] && $komposisi_aturan[1] >= $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Waspada");
         } else if ($komposisi_aturan[2] > $komposisi_aturan[0] && $komposisi_aturan[2] > $komposisi_aturan[1]) {
             array_push($komposisi_aturan, "Bahaya");
-        } else {
         }
+
         return $komposisi_aturan;
     }
 
@@ -139,8 +139,6 @@ class FuzzyController extends Controller
         $variabel_fuzzy = DB::table('tbl_range_fuzzy')->get();
         $a1 = 0;
         $a2 = 0;
-        print_r($komposisi_aturan);
-        die;
         if ($komposisi_aturan[3] == "Aman") {
             $a1 = $variabel_fuzzy[6]->a  + ($komposisi_aturan[0] * ($variabel_fuzzy[6]->b - $variabel_fuzzy[6]->a));
             $a2 = $variabel_fuzzy[6]->c  - ($komposisi_aturan[0] * ($variabel_fuzzy[6]->c - $variabel_fuzzy[6]->b));
@@ -159,7 +157,7 @@ class FuzzyController extends Controller
     {
         $a1 = $nilai_keanggotaan["a1"];
         $a2 = $nilai_keanggotaan["a2"];
-        $output = ((($a1 - $a2 + 1) * ($a1 + $a2)) / 2) / ($a1 - $a2 + 1);
+        $output = ((($a2 - $a1 + 1) * ($a1 + $a2)) / 2) / ($a2 - $a1 + 1);
         if ($output == 1) {
             $deffuzifikasi = ["Aman", $output];
         } else if ($output == 2) {
