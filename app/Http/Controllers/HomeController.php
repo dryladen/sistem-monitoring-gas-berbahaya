@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataGas;
+use App\Models\OutputFuzzy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,15 +24,17 @@ class HomeController extends Controller
         // ]);
         $data = array(
             'title' => 'Dashboard',
+            'user' => Auth::user()->name,
         );
         return view('dashboard', $data);
     }
-    
+
     public function riwayat_monitoring()
     {
         $data = array(
             'title' => 'Riwayat Monitoring',
-            'data_gas' => DataGas::all(),
+            'user' => Auth::user()->name,
+            'data_gas' => OutputFuzzy::all(),
         );
         return view('riwayat_monitoring', $data);
     }

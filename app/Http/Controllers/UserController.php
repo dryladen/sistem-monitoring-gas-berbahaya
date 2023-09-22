@@ -14,7 +14,7 @@ class UserController extends Controller
         $data = array(
             'title' => 'Data User',
             'data_user' => User::all(),
-            'user-login' => Auth::user()->name,
+            'user' => Auth::user()->name,'user-login' => Auth::user()->name,
         );
         return view('user', $data);
     }
@@ -24,6 +24,7 @@ class UserController extends Controller
         
         $data = array(
             'title' => 'Profile',
+            'user' => Auth::user()->name,
             'data_profile' => User::where('id',$user->id)->get(),
         );
         

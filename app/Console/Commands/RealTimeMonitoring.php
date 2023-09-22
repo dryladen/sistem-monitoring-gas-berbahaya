@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DataFuzzy;
+use App\Models\OutputFuzzy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -205,12 +206,14 @@ class RealTimeMonitoring extends Command
             'gas_amonia' => $amonia,
             'gas_metana' => $metana,
         ]);
+        print($amonia);
+        print($metana);
         // Cmd run schedul : php artisan schedule:work
         // Ini masih bermasalah menyimpan data ke database
         // // ! Perhitungan Fuzzy
         $dataFuzzy = $this->fuzzyMamdani($amonia, $metana);
         // // // ! Menyimpan Perhitungan ke Database
-        DB::table('tbl_hitung_fuzzy')->insert([
+        OutputFuzzy::create([
             'gas_amonia' => $amonia,
             'gas_metana' => $metana,
             'komposisi_aman' => $dataFuzzy['komposisi_aturan'][0],

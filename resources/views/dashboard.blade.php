@@ -20,11 +20,11 @@
                     </div>
                 </div>
                 <hr>
-                <div class="row">
-                    <div class="col-3">
+                <div class="row m-sm-2 m-lg-0 m-1">
+                    <div class="col-sm col-md-3">
                         <div class="card card-widget">
-                            <div class="card-body gradient-9">
-                                <div class="media">
+                            <div class="card-body gradient-9 p-md-3">
+                                <div class="media d-flex justify-content-center align-items-center">
                                     <span class="card-widget__icon"><i class="icon-fire"></i></span>
                                     <div class="media-body">
                                         <h2 id="nilai_amonia" class="card-widget__title">0 PPM</h2>
@@ -34,11 +34,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-sm col-md-3">
                         <div class="card card-widget">
-                            <div class="card-body gradient-5">
-                                <div class="media">
-                                    <span class="card-widget__icon"><i class="icon-fire"></i></span>
+                            <div class="card-body gradient-5 p-md-3">
+                                <div class="media d-flex justify-content-center align-items-center">
+                                    <span class="card-widget__icon "><i class="icon-fire"></i></span>
                                     <div class="media-body">
                                         <h2 id="nilai_metana" class="card-widget__title">0 PPM</h2>
                                         <h5 class="card-widget__subtitle">Gas Metana</h5>
@@ -47,10 +47,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-sm col-md-6">
                         <div class="card card-widget">
-                            <div class="card-body gradient-4">
-                                <div class="media">
+                            <div class="card-body gradient-4 p-md-3">
+                                <div class="media d-flex justify-content-center align-items-center">
                                     <span class="card-widget__icon"><i class="icon-home"></i></span>
                                     <div class="media-body">
                                         <h2 id="nilai_kondisi" class="card-widget__title">Aman</h2>
@@ -133,6 +133,6 @@
         updateChart();
         setInterval(() => {
             updateChart();
-        }, 10000);
+        }, 60000);
     </script>
 @endsection

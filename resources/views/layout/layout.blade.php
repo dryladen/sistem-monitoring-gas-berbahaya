@@ -17,7 +17,6 @@
 </head>
 
 <body>
-
     <!--*******************
         Preloader start
     ********************-->
@@ -33,7 +32,6 @@
         Preloader end
     ********************-->
 
-
     <!--**********************************
         Main wrapper start
     ***********************************-->
@@ -46,9 +44,9 @@
             <div class="brand-logo">
                 <a class="p-3" href="#">
                     <b class="logo-abbr"><img src="/assets/images/icon-ayam.png" alt=""> </b>
-                    <span class="logo-compact"><img src="/assets/images/logo-compact.png" alt=""></span>
+                    <span class="logo-compact"></span>
                     <span class="brand-title">
-                        <p class="text-white">Sistem Monitoring Gas Berbahaya</p>
+                        <p class="text-white text-bold">Sistem Monitoring Gas Berbahaya</p>
                     </span>
                 </a>
             </div>
@@ -72,13 +70,13 @@
 
                 </div>
                 <div class="header-right">
-                    <ul class="clearfix">
-                        <li class="icons dropdown">
+                    <ul class="clearfix ">
+                        <li class="icons dropdown mt-2 mr-3 m-0 d-flex justify-content-center align-items-center">
                             <div class="user-img c-pointer position-relative" data-toggle="dropdown">
-                                <span class="activity active"></span>
-                                <img src="/assets/images/user/1.png" height="40" width="40" alt="">
+                                <b class="text-bold">{{ $user }}</b>
+                                <img src="/assets/images/user-png.png" height="40" width="40" alt="">
                             </div>
-                            <div class="drop-down dropdown-profile   dropdown-menu">
+                            <div class="drop-down dropdown-profile dropdown-menu">
                                 <div class="dropdown-content-body">
                                     <ul>
                                         <li>
@@ -86,7 +84,7 @@
                                                 <span>Profil</span></a>
                                         </li>
                                         <hr class="my-2">
-                                        <li><a href="logout"><i class="icon-key"></i> <span>Keluar</span></a></li>
+                                        <li><a href="logout"><i class="icon-logout"></i> <span>Keluar</span></a></li>
                                     </ul>
                                 </div>
                             </div>

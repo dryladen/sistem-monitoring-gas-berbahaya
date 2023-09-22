@@ -21,14 +21,24 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
+                                            <th>Waktu</th>
                                             <th>Gas Amonia</th>
                                             <th>Gas Metana</th>
                                             <th>Kondisi Kandang</th>
-                                            <th>Waktu</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @php
+                                            $no = 1;
+                                        @endphp
                                         @foreach ($data_gas as $item)
+                                            <tr>
+                                                <td>{{ $no++ }}</td>
+                                                <td>{{ $item->created_at }}</td>
+                                                <td>{{ $item->gas_amonia }}</td>
+                                                <td>{{ $item->gas_metana }}</td>
+                                                <td>{{ $item->kondisi }}</td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -39,4 +49,31 @@
             </div>
         </div>
     </div>
+@endsection
+@section('scripts')
+    @parent
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
+        var updateData = function() {
+            $.ajax({
+                url: "{{ route('dataGas') }}",
+                type: 'GET',
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(data) {
+
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        updateData();
+        setInterval(() => {
+            updateData();
+        }, 10000);
+    </script>
 @endsection
