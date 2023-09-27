@@ -30,16 +30,15 @@
         Preloader end
     ********************-->
 
-    <div class="login-form-bg h-100">
+    <div class="login-form-bg h-100 bg-ayam">
         <div class="container h-100">
             <div class="row justify-content-center h-100">
                 <div class="col-xl-6">
                     <div class="form-input-content">
                         <div class="card login-form mb-0">
                             <div class="card-body pt-5">
-                                <a class="text-center" href="index.html">
-                                    <h4>Silahkan Login</h4>
-                                </a>
+                                <h3 class="text-center mb-5">SISTEM MONITORING GAS BERBAHAYA PADA KANDANG AYAM BROILER</h3>
+                                <h4 class="text-center">Silahkan Login</h4>
                                 @if ($errors->any())
                                     <div class="alert alert-danger">
                                         <ul>
@@ -49,7 +48,7 @@
                                         </ul>
                                     </div>
                                 @endif
-                                <form class="mt-5 mb-5 login-input" method="post" action="">
+                                <form class="mt-2 mb-5 login-input" method="post" action="">
                                     @csrf
                                     <div class="form-group">
                                         <input type="email" class="form-control" placeholder="Email" name="email"

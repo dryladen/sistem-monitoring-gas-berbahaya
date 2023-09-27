@@ -47,6 +47,7 @@ class FuzzyController extends Controller
         return response()->json(compact('labels', 'amonia', 'metana', 'nilai_last_amonia', 'nilai_last_metana', 'nilai_kondisi'));
     }
 
+    // ? Proses perhitungan fuzzy mamdani untuk gas berbahaya pada kandang ayam
     // ! Fuzifikasi
     // Fungsi keanggotaan segitiga
     private function fSegitiga($x, $a, $b, $c)
@@ -86,7 +87,7 @@ class FuzzyController extends Controller
         }
     }
 
-    // ! Fungsi Implikasi
+    // ! Fuzzifikasi
     private function fuzzifikasi($data_amonia, $data_metana)
     {
         $variabel_fuzzy = DataFuzzy::all();
@@ -106,6 +107,7 @@ class FuzzyController extends Controller
         return $derajat_keanggotaan;
     }
 
+    // ! Fungsi Implikasi
     private function fungsiImplikasi($derajat_keanggotaan)
     {
         $aturanFuzzy = DB::table("tbl_aturan_fuzzy")->get();
@@ -116,6 +118,7 @@ class FuzzyController extends Controller
         return $alpa_predikat;
     }
 
+    // ! Komposisi Aturan
     private function komposisiAturan($alpa_predikat) // perlu error handling disini ketika terdapat nilai komposisi aturan yang sama 
     {
         $komposisi_aturan = array();
@@ -134,6 +137,7 @@ class FuzzyController extends Controller
         return $komposisi_aturan;
     }
 
+    // ! Mencari nilai a1 dan a2
     private function nilaiKeanggotaan($komposisi_aturan)
     {
         $variabel_fuzzy = DB::table('tbl_range_fuzzy')->get();
@@ -153,21 +157,23 @@ class FuzzyController extends Controller
         return $nilai_keanggotaan;
     }
 
-    private function deffuzifikasi($nilai_keanggotaan)
+    // ! Defuzzifikasi
+    private function defuzzifikasi($nilai_keanggotaan)
     {
         $a1 = $nilai_keanggotaan["a1"];
         $a2 = $nilai_keanggotaan["a2"];
         $output = ((($a2 - $a1 + 1) * ($a1 + $a2)) / 2) / ($a2 - $a1 + 1);
         if ($output == 1) {
-            $deffuzifikasi = ["Aman", $output];
+            $defuzzifikasi = ["Aman", $output];
         } else if ($output == 2) {
-            $deffuzifikasi = ["Waspada", $output];
+            $defuzzifikasi = ["Waspada", $output];
         } else if ($output == 3) {
-            $deffuzifikasi = ["Bahaya", $output];
+            $defuzzifikasi = ["Bahaya", $output];
         }
-        return $deffuzifikasi;
+        return $defuzzifikasi;
     }
 
+    // ! Main function fuzzy mamdani
     private function fuzzyMamdani($data_amonia, $data_metana)
     {
         // Fuzzifikasi
@@ -179,7 +185,7 @@ class FuzzyController extends Controller
         // mencari a1 dan a2
         $nilai_keanggotaan = $this->nilaiKeanggotaan($komposisi_aturan);
         // Deffuzifikasi
-        $deffuzifikasi = $this->deffuzifikasi($nilai_keanggotaan);
+        $defuzzifikasi = $this->defuzzifikasi($nilai_keanggotaan);
 
         $FuzzyMamdani = array(
             'data_amonia' => $data_amonia,
@@ -188,7 +194,7 @@ class FuzzyController extends Controller
             'alpa_predikat' => $alpa_predikat,
             'komposisi_aturan' => $komposisi_aturan,
             'nilai_keanggotaan' => $nilai_keanggotaan,
-            'output' => $deffuzifikasi
+            'output' => $defuzzifikasi
         );
         return $FuzzyMamdani;
     }

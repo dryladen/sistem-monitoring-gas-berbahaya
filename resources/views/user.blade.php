@@ -9,7 +9,7 @@
                 </ol>
             </div>
         </div>
-        <div class="container-fluid">
+        <div class="container-fluid pt-0">
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -138,7 +138,7 @@
                                 <label for="role">Role</label>
                                 <select name="role" class="form-control" required>
                                     <option <?php if ($userEdit['role'] == "admin") echo "selected"; ?> value="admin">Admin</option>
-                                    <option <?php if ($userEdit['role'] == "kasir") echo "selected"; ?> value="kasir">Kasir</option>
+                                    <option <?php if ($userEdit['role'] == "peternak") echo "selected"; ?> value="peternak">Peternak</option>
                                 </select>
                             </div>
                         </div>

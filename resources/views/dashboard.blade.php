@@ -9,13 +9,12 @@
                 </ol>
             </div>
         </div>
-       
         <div class="row">
-            <div class="container-fluid">
-                <div class="card">
+            <div class="container-fluid pt-0">
+                <div class="card d-none d-sm-block">
                     <div class="card-body">
                         <h4 class="card-title">Data Gas Amonia dan Gas Metana</h4>
-                        <canvas height="100" id="myChart"></canvas>
+                        <canvas height="75" id="myChart"></canvas>
                         {{-- <canvas id="sales-chart" width="500" height="250"></canvas> --}}
                     </div>
                 </div>
@@ -119,8 +118,8 @@
                     myChart.data.datasets[1].data = data.metana;
                     myChart.update();
                     // update data dibawah chart
-                    nilai_metana.innerHTML = data.nilai_last_metana;
-                    nilai_amonia.innerHTML = data.nilai_last_amonia;
+                    nilai_metana.innerHTML = data.nilai_last_metana + " PPM";
+                    nilai_amonia.innerHTML = data.nilai_last_amonia + " PPM";
                     nilai_kondisi.innerHTML = data.nilai_kondisi['output'][0];
                     console.log(nilai_kondisi)
                 },
