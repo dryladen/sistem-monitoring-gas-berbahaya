@@ -1,7 +1,6 @@
 @extends('layout.layout')
 @section('content')
     <div class="content-body">
-
         <div class="row page-titles mx-0">
             <div class="col p-md-0">
                 <ol class="breadcrumb">
@@ -11,6 +10,19 @@
             </div>
         </div>
         <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Himpunan Fuzzy</h4>
+                            <span class="font-weight-bold">Amonia : {{ $amonia }}</span>
+                            <br>
+                            <span class="font-weight-bold">Metana : {{ $metana }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">

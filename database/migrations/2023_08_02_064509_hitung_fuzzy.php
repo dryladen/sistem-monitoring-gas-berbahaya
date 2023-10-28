@@ -21,7 +21,7 @@ return new class extends Migration
             $table->float('nilai_a1')->nullable();
             $table->float('nilai_a2')->nullable();
             $table->float('output_deff')->nullable();
-            $table->float('kondisi')->nullable();
+            $table->string('kondisi')->nullable();
             $table->timestamps();
         });
     }

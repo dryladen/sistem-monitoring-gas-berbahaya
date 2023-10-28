@@ -15,12 +15,10 @@
                     <div class="card-body">
                         <h4 class="card-title">Data Gas Amonia dan Gas Metana</h4>
                         <canvas height="75" id="myChart"></canvas>
-                        {{-- <canvas id="sales-chart" width="500" height="250"></canvas> --}}
                     </div>
                 </div>
-                <hr>
                 <div class="row m-sm-2 m-lg-0 m-1">
-                    <div class="col-sm col-md-3">
+                    <div class="col-sm col-md-4">
                         <div class="card card-widget">
                             <div class="card-body gradient-9 p-md-3">
                                 <div class="media d-flex justify-content-center align-items-center">
@@ -33,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm col-md-3">
+                    <div class="col-sm col-md-4">
                         <div class="card card-widget">
                             <div class="card-body gradient-5 p-md-3">
                                 <div class="media d-flex justify-content-center align-items-center">
@@ -46,7 +44,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm col-md-6">
+                    <div class="col-sm col-md-4">
                         <div class="card card-widget">
                             <div class="card-body gradient-4 p-md-3">
                                 <div class="media d-flex justify-content-center align-items-center">
@@ -121,10 +119,9 @@
                     nilai_metana.innerHTML = data.nilai_last_metana + " PPM";
                     nilai_amonia.innerHTML = data.nilai_last_amonia + " PPM";
                     nilai_kondisi.innerHTML = data.nilai_kondisi['output'][0];
-                    console.log(nilai_kondisi)
                 },
                 error: function(data) {
-                    console.log(data);
+                    console.log('gagal')
                 }
             });
         }
@@ -132,6 +129,6 @@
         updateChart();
         setInterval(() => {
             updateChart();
-        }, 60000);
+        }, 10000);
     </script>
 @endsection

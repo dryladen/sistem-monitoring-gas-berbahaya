@@ -18,10 +18,6 @@ class HomeController extends Controller
     }
     public function home()
     {
-        // DataGas::create([
-        //     "amonia" => 1,
-        //     "metana" => 2
-        // ]);
         $data = array(
             'title' => 'Dashboard',
             'user' => Auth::user()->name,

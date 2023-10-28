@@ -5,26 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\AturanFuzzy;
 use App\Models\DataFuzzy;
 use App\Models\DataGas;
+use App\Models\OutputFuzzy;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class FuzzyController extends Controller
 {
     public function index()
     {
-        // $dataGas = DataGas::latest()->take(10)->get()->sortBy('id');
-        // $dataGas_last = DataGas::latest()->first();
         $data = array(
             "title" => "Himpunan Fuzzy",
             "data_fuzzy" => DataFuzzy::join("tbl_variabel_fuzzy", "tbl_variabel_fuzzy.id", "=", "tbl_range_fuzzy.id")->select("tbl_range_fuzzy.*", "tbl_variabel_fuzzy.variabel")->get(),
             "aturan_fuzzy" => AturanFuzzy::all(),
             'user' => Auth::user()->name,
-            "fuzzy_mamdani" => $this->fuzzyMamdani(20, 46)
+            "amonia" => $this->getData()['amonia'],
+            "metana" => $this->getData()['metana'],
+            "fuzzy_mamdani" => $this->fuzzyMamdani($this->getData()['amonia'], $this->getData()['metana'])
         );
         return view('fuzzy', $data);
     }
-
+    private function getData()
+    {
+        $response = Http::withHeaders([
+            'X-M2M-Origin' => "d62b58a24f685c68:e294312a591f2234",
+        ])->get('https://platform.antares.id:8443/~/antares-cse/antares-id/KandangAyam_Bantuas/Data1/la');
+        $dataJson = json_decode($response, true);
+        return json_decode($dataJson['m2m:cin']['con'], true);
+    }
     public function dataGas()
     {
         // Mengambil 10 data terakhir
@@ -126,12 +135,17 @@ class FuzzyController extends Controller
         array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[5]));
         array_push($komposisi_aturan, max($alpa_predikat[6], $alpa_predikat[7], $alpa_predikat[8]));
 
+        // if (aman > waspada dan aman >= bahaya)
         if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] >= $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Aman");
+            // else if (waspada > aman dan waspada >= bahaya)
         } else if ($komposisi_aturan[1] > $komposisi_aturan[0] && $komposisi_aturan[1] >= $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Waspada");
+            // else if (bahaya > aman dan bahaya > waspada)
         } else if ($komposisi_aturan[2] > $komposisi_aturan[0] && $komposisi_aturan[2] > $komposisi_aturan[1]) {
             array_push($komposisi_aturan, "Bahaya");
+        } else {
+            array_push($komposisi_aturan, "Aman");
         }
 
         return $komposisi_aturan;
@@ -196,6 +210,7 @@ class FuzzyController extends Controller
             'nilai_keanggotaan' => $nilai_keanggotaan,
             'output' => $defuzzifikasi
         );
+        
         return $FuzzyMamdani;
     }
 }

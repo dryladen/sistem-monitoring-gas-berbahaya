@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\DataFuzzy;
 use App\Models\OutputFuzzy;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -100,7 +101,7 @@ class RealTimeMonitoring extends Command
         }
         return $alpa_predikat;
     }
-
+    // Mencari nilai maksimum 
     private function komposisiAturan($alpa_predikat)
     {
         $komposisi_aturan = array();
@@ -115,10 +116,11 @@ class RealTimeMonitoring extends Command
         } else if ($komposisi_aturan[2] > $komposisi_aturan[0] && $komposisi_aturan[2] > $komposisi_aturan[1]) {
             array_push($komposisi_aturan, "Bahaya");
         } else {
+            array_push($komposisi_aturan, "Aman");
         }
         return $komposisi_aturan;
     }
-
+    // Mencari a1 dan a2 untuk deffuzifikasi
     private function nilaiKeanggotaan($komposisi_aturan)
     {
         $variabel_fuzzy = DB::table('tbl_range_fuzzy')->get();
@@ -177,42 +179,28 @@ class RealTimeMonitoring extends Command
         );
         return $FuzzyMamdani;
     }
-    private function getData($url)
+    private function getData()
     {
-        $headers = [
-            "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXYiOiJLYW5kYW5nQXlhbV9CYW50dWFzIiwiaWF0IjoxNjkyNjgxNTQ5LCJqdGkiOiI2NGU0NDU0ZGE2YTIyNWY3ODAwNzI1YzMiLCJzdnIiOiJhcC1zb3V0aGVhc3QuYXdzLnRoaW5nZXIuaW8iLCJ1c3IiOiJLZWxhc0tpbGF0In0.weXlqGTTwe2PfSYKK-0OBLhQodAmBB9sLiCG1aTvTJc"
-        ];
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
+        $response = Http::withHeaders([
+            'X-M2M-Origin' => "d62b58a24f685c68:e294312a591f2234",
+        ])->get('https://platform.antares.id:8443/~/antares-cse/antares-id/KandangAyam_Bantuas/Data1/la');
         $dataJson = json_decode($response, true);
-        $data = number_format($dataJson, 2);
-
-        return $data;
+        return json_decode($dataJson['m2m:cin']['con'], true);
     }
     public function handle()
     {
         //Mengambil data dari API
-        // $amonia = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/CH4");
-        // $metana = $this->getData("https://backend.thinger.io/v3/users/KelasKilat/devices/KandangAyam_Bantuas/resources/temp");
-        $amonia = rand(0,25);
-        $metana = rand(0,110);
-
+        $amonia = $this->getData()['amonia'];
+        $metana = $this->getData()['metana'];
         DB::table('tbl_data_gas')->insert([
             'gas_amonia' => $amonia,
             'gas_metana' => $metana,
         ]);
-        print($amonia);
-        print($metana);
         // Cmd run schedul : php artisan schedule:work
         // Ini masih bermasalah menyimpan data ke database
-        // // ! Perhitungan Fuzzy
+        // ! Perhitungan Fuzzy
         $dataFuzzy = $this->fuzzyMamdani($amonia, $metana);
-        // // // ! Menyimpan Perhitungan ke Database
+        //  ! Menyimpan Perhitungan ke Database
         OutputFuzzy::create([
             'gas_amonia' => $amonia,
             'gas_metana' => $metana,
