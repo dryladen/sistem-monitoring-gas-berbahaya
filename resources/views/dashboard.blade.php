@@ -121,7 +121,7 @@
                     nilai_kondisi.innerHTML = data.nilai_kondisi['output'][0];
                 },
                 error: function(data) {
-                    console.log('gagal')
+                    console.log('Data tidak terkirim')
                 }
             });
         }

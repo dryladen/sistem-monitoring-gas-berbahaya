@@ -72,36 +72,48 @@ class RealTimeMonitoring extends Command
         }
     }
 
-    // ! Fungsi Implikasi
+    // ! Fungsi Fuzzifikasi
     private function fuzzifikasi($data_amonia, $data_metana)
     {
         $variabel_fuzzy = DataFuzzy::all();
         // ? Menghitung derajat keanggotaan
         $derajat_keanggotaan = array(
             "Amonia" => array(
-                "Rendah" => $this->fSegitiga($data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"], $variabel_fuzzy[0]["c"]),
-                "Normal" => $this->fSegitiga($data_amonia, $variabel_fuzzy[1]["a"], $variabel_fuzzy[1]["b"], $variabel_fuzzy[1]["c"]),
-                "Tinggi" => $this->fSegitiga($data_amonia, $variabel_fuzzy[2]["a"], $variabel_fuzzy[2]["b"], $variabel_fuzzy[2]["c"]),
+                "Rendah" => $this->fSegitiga(
+                    $data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"], $variabel_fuzzy[0]["c"]),
+                "Normal" => $this->fSegitiga(
+                    $data_amonia, $variabel_fuzzy[1]["a"], $variabel_fuzzy[1]["b"], $variabel_fuzzy[1]["c"]),
+                "Tinggi" => $this->fSegitiga(
+                    $data_amonia, $variabel_fuzzy[2]["a"], $variabel_fuzzy[2]["b"], $variabel_fuzzy[2]["c"]),
             ),
             "Metana" => array(
-                "Rendah" => $this->fLinearTurun($data_metana, $variabel_fuzzy[3]["a"], $variabel_fuzzy[3]["b"]),
-                "Normal" => $this->fSegitiga($data_metana, $variabel_fuzzy[4]["a"], $variabel_fuzzy[4]["b"], $variabel_fuzzy[4]["c"]),
-                "Tinggi" => $this->fLinearNaik($data_metana, $variabel_fuzzy[5]["a"], $variabel_fuzzy[5]["b"]),
+                "Rendah" => $this->fLinearTurun(
+                    $data_metana, $variabel_fuzzy[3]["a"], $variabel_fuzzy[3]["b"]),
+                "Normal" => $this->fSegitiga(
+                    $data_metana, $variabel_fuzzy[4]["a"], $variabel_fuzzy[4]["b"], $variabel_fuzzy[4]["c"]),
+                "Tinggi" => $this->fLinearNaik(
+                    $data_metana, $variabel_fuzzy[5]["a"], $variabel_fuzzy[5]["b"]),
             )
         );
         return $derajat_keanggotaan;
     }
 
+    // ! Fungsi Implikasi
     private function fungsiImplikasi($derajat_keanggotaan)
     {
         $aturanFuzzy = DB::table("tbl_aturan_fuzzy")->get();
         $alpa_predikat = array();
         foreach ($aturanFuzzy as $item) {
-            array_push($alpa_predikat, min($derajat_keanggotaan["Amonia"][$item->variabel1], $derajat_keanggotaan["Metana"][$item->variabel2]));
+            // Menentukan Alpa Predikat menggunakan metode Min
+            array_push(
+                $alpa_predikat,
+                min($derajat_keanggotaan["Amonia"][$item->variabel1], $derajat_keanggotaan["Metana"][$item->variabel2])
+            );
         }
         return $alpa_predikat;
     }
-    // Mencari nilai maksimum 
+
+    // ! Fungsi Komposisi Aturan 
     private function komposisiAturan($alpa_predikat)
     {
         $komposisi_aturan = array();
@@ -109,6 +121,7 @@ class RealTimeMonitoring extends Command
         array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[5]));
         array_push($komposisi_aturan, max($alpa_predikat[6], $alpa_predikat[7], $alpa_predikat[8]));
 
+        // Menentukan komposisi aturan dengan menggunakan metode Max
         if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] > $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Aman");
         } else if ($komposisi_aturan[1] > $komposisi_aturan[0] && $komposisi_aturan[1] > $komposisi_aturan[2]) {
@@ -120,7 +133,8 @@ class RealTimeMonitoring extends Command
         }
         return $komposisi_aturan;
     }
-    // Mencari a1 dan a2 untuk deffuzifikasi
+
+    // ! Mencari a1 dan a2 untuk deffuzifikasi
     private function nilaiKeanggotaan($komposisi_aturan)
     {
         $variabel_fuzzy = DB::table('tbl_range_fuzzy')->get();
@@ -140,10 +154,12 @@ class RealTimeMonitoring extends Command
         return $nilai_keanggotaan;
     }
 
+    // ! Fungsi Deffuzifikasi
     private function deffuzifikasi($nilai_keanggotaan)
     {
         $a1 = $nilai_keanggotaan["a1"];
         $a2 = $nilai_keanggotaan["a2"];
+        // Menggunakan rumus MoM (Mean Of Maximum)
         $output = ((($a1 - $a2 + 1) * ($a1 + $a2)) / 2) / ($a1 - $a2 + 1);
         if ($output == 1) {
             $deffuzifikasi = ["Aman", $output];
