@@ -14,13 +14,13 @@ class AturanFuzzy extends Seeder
     public function run(): void
     {
         $rangeVariabel = [
-            ['variabel1' => "Rendah", 'variabel2' => "Rendah", "konklusi" => "Aman"],
-            ['variabel1' => "Rendah", 'variabel2' => "Normal", "konklusi" => "Aman"],
-            ['variabel1' => "Rendah", 'variabel2' => "Tinggi", "konklusi" => "Waspada"],
             ['variabel1' => "Normal", 'variabel2' => "Rendah", "konklusi" => "Aman"],
-            ['variabel1' => "Normal", 'variabel2' => "Normal", "konklusi" => "Waspada"],
+            ['variabel1' => "Normal", 'variabel2' => "Normal", "konklusi" => "Aman"],
             ['variabel1' => "Normal", 'variabel2' => "Tinggi", "konklusi" => "Waspada"],
-            ['variabel1' => "Tinggi", 'variabel2' => "Rendah", "konklusi" => "Bahaya"],
+            ['variabel1' => "Sedang", 'variabel2' => "Rendah", "konklusi" => "Aman"],
+            ['variabel1' => "Sedang", 'variabel2' => "Normal", "konklusi" => "Waspada"],
+            ['variabel1' => "Sedang", 'variabel2' => "Tinggi", "konklusi" => "Bahaya"],
+            ['variabel1' => "Tinggi", 'variabel2' => "Rendah", "konklusi" => "Waspada"],
             ['variabel1' => "Tinggi", 'variabel2' => "Normal", "konklusi" => "Bahaya"],
             ['variabel1' => "Tinggi", 'variabel2' => "Tinggi", "konklusi" => "Bahaya"],
         ];

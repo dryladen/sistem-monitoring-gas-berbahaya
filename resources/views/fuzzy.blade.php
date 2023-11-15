@@ -36,6 +36,7 @@
                                             <th>a</th>
                                             <th>b</th>
                                             <th>c</th>
+                                            <th>d</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -45,6 +46,7 @@
                                                 <td>{{ $item->a }}</td>
                                                 <td>{{ $item->b }}</td>
                                                 <td>{{ $item->c }}</td>
+                                                <td>{{ $item->d }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -72,8 +74,8 @@
                                     <tbody>
                                         <tr>
                                             <td>Amonia</td>
-                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Rendah'] }}</td>
                                             <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Normal'] }}</td>
+                                            <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Sedang'] }}</td>
                                             <td>{{ $fuzzy_mamdani['derajat_keanggotaan']['Amonia']['Tinggi'] }}</td>
                                         </tr>
                                         <tr>

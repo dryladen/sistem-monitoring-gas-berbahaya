@@ -4477,8 +4477,8 @@ button.close {
 
 /* ! manual add */
 .bg-ayam {
-  background-image: url("/assets/images/Ayam-broiler.jpg");
-  background-size: contain;
+  background-image: url("/assets/images/Ayam-Dikandang.jpg");
+  background-size: cover;
 }
 a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,

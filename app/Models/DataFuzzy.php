@@ -16,6 +16,7 @@ class DataFuzzy extends Model
         'a',
         'b',
         'c',
+        'd'
     ];
 
     const CREATED_AT = 'created_at';

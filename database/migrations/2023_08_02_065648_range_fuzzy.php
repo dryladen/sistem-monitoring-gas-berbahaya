@@ -17,6 +17,7 @@ return new class extends Migration
             $table->float('a')->nullable();
             $table->float('b')->nullable();
             $table->float('c')->nullable();
+            $table->float('d')->nullable();
             $table->timestamps();
         });
     }

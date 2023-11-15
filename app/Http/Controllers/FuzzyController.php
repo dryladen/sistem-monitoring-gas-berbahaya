@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\AturanFuzzy;
 use App\Models\DataFuzzy;
 use App\Models\DataGas;
-use App\Models\OutputFuzzy;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -56,9 +55,10 @@ class FuzzyController extends Controller
         return response()->json(compact('labels', 'amonia', 'metana', 'nilai_last_amonia', 'nilai_last_metana', 'nilai_kondisi'));
     }
 
-    // ? Proses perhitungan fuzzy mamdani untuk gas berbahaya pada kandang ayam
+    //  ! Kodingan perhitungan fuzzy
+
     // ! Fuzifikasi
-    // Fungsi keanggotaan segitiga
+    // ? Fungsi keanggotaan segitiga
     private function fSegitiga($x, $a, $b, $c)
     {
         if ($x <= $a || $x >= $c) {
@@ -72,7 +72,7 @@ class FuzzyController extends Controller
         }
     }
 
-    // Fungsi keanggotaan linear naik
+    // ? Fungsi keanggotaan linear naik
     private function fLinearNaik($x, $a, $b)
     {
         if ($x <= $a) {
@@ -84,7 +84,7 @@ class FuzzyController extends Controller
         }
     }
 
-    // Fungsi keanggotaan linear turun
+    // ? Fungsi keanggotaan linear turun
     private function fLinearTurun($x, $a, $b)
     {
         if ($x <= $a) {
@@ -95,22 +95,43 @@ class FuzzyController extends Controller
             return ($b - $x) / ($b - $a);
         }
     }
+    // ? Fungsi keanggotaan linear turun
+    private function fTrapesium($x, $a, $b, $c, $d)
+    {
+        if ($x >= $b && $x <= $c) {
+            return 1;
+        } elseif ($x <= $a && $x >= $d) {
+            return 0;
+        } elseif ($x >= $a && $x <= $b) {
+            return ($x-$a)/($b-$a);
+        } elseif ($x >= $c && $x <= $d) {
+            return ($d-$x)/($d-$c);
+        } elseif ($x <= $b ) {
+            return 0;
+        } 
+    }
 
-    // ! Fuzzifikasi
+    // ! Fungsi Fuzzifikasi
     private function fuzzifikasi($data_amonia, $data_metana)
     {
         $variabel_fuzzy = DataFuzzy::all();
-        // Menghitung derajat keanggotaan
+        // ? Menghitung derajat keanggotaan
         $derajat_keanggotaan = array(
             "Amonia" => array(
-                "Rendah" => $this->fSegitiga($data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"], $variabel_fuzzy[0]["c"]),
-                "Normal" => $this->fSegitiga($data_amonia, $variabel_fuzzy[1]["a"], $variabel_fuzzy[1]["b"], $variabel_fuzzy[1]["c"]),
-                "Tinggi" => $this->fSegitiga($data_amonia, $variabel_fuzzy[2]["a"], $variabel_fuzzy[2]["b"], $variabel_fuzzy[2]["c"]),
+                "Normal" => $this->fLinearTurun(
+                    $data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"]),
+                "Sedang" => $this->fTrapesium(
+                    $data_amonia, $variabel_fuzzy[1]["a"], $variabel_fuzzy[1]["b"], $variabel_fuzzy[1]["c"], $variabel_fuzzy[1]["d"]),
+                "Tinggi" => $this->fLinearNaik(
+                    $data_amonia, $variabel_fuzzy[2]["a"], $variabel_fuzzy[2]["b"]),
             ),
             "Metana" => array(
-                "Rendah" => $this->fLinearTurun($data_metana, $variabel_fuzzy[3]["a"], $variabel_fuzzy[3]["b"]),
-                "Normal" => $this->fSegitiga($data_metana, $variabel_fuzzy[4]["a"], $variabel_fuzzy[4]["b"], $variabel_fuzzy[4]["c"]),
-                "Tinggi" => $this->fLinearNaik($data_metana, $variabel_fuzzy[5]["a"], $variabel_fuzzy[5]["b"]),
+                "Rendah" => $this->fLinearTurun(
+                    $data_metana, $variabel_fuzzy[3]["a"], $variabel_fuzzy[3]["b"]),
+                "Normal" => $this->fSegitiga(
+                    $data_metana, $variabel_fuzzy[4]["a"], $variabel_fuzzy[4]["b"], $variabel_fuzzy[4]["c"]),
+                "Tinggi" => $this->fLinearNaik(
+                    $data_metana, $variabel_fuzzy[5]["a"], $variabel_fuzzy[5]["b"]),
             )
         );
         return $derajat_keanggotaan;
@@ -122,36 +143,37 @@ class FuzzyController extends Controller
         $aturanFuzzy = DB::table("tbl_aturan_fuzzy")->get();
         $alpa_predikat = array();
         foreach ($aturanFuzzy as $item) {
-            array_push($alpa_predikat, min($derajat_keanggotaan["Amonia"][$item->variabel1], $derajat_keanggotaan["Metana"][$item->variabel2]));
+            // Menentukan Alpa Predikat menggunakan metode Min berdasarkan aturan fuzzy
+            array_push(
+                $alpa_predikat,
+                min($derajat_keanggotaan["Amonia"][$item->variabel1], $derajat_keanggotaan["Metana"][$item->variabel2])
+            );
         }
         return $alpa_predikat;
     }
 
-    // ! Komposisi Aturan
-    private function komposisiAturan($alpa_predikat) // perlu error handling disini ketika terdapat nilai komposisi aturan yang sama 
+    // ! Fungsi Komposisi Aturan 
+    private function komposisiAturan($alpa_predikat)
     {
         $komposisi_aturan = array();
         array_push($komposisi_aturan, max($alpa_predikat[0], $alpa_predikat[1], $alpa_predikat[3]));
         array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[5]));
         array_push($komposisi_aturan, max($alpa_predikat[6], $alpa_predikat[7], $alpa_predikat[8]));
 
-        // if (aman > waspada dan aman >= bahaya)
-        if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] >= $komposisi_aturan[2]) {
+        // Menentukan komposisi aturan dengan menggunakan metode Max
+        if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] > $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Aman");
-            // else if (waspada > aman dan waspada >= bahaya)
-        } else if ($komposisi_aturan[1] > $komposisi_aturan[0] && $komposisi_aturan[1] >= $komposisi_aturan[2]) {
+        } else if ($komposisi_aturan[1] > $komposisi_aturan[0] && $komposisi_aturan[1] > $komposisi_aturan[2]) {
             array_push($komposisi_aturan, "Waspada");
-            // else if (bahaya > aman dan bahaya > waspada)
         } else if ($komposisi_aturan[2] > $komposisi_aturan[0] && $komposisi_aturan[2] > $komposisi_aturan[1]) {
             array_push($komposisi_aturan, "Bahaya");
         } else {
             array_push($komposisi_aturan, "Aman");
         }
-
         return $komposisi_aturan;
     }
 
-    // ! Mencari nilai a1 dan a2
+    // ! Mencari a1 dan a2 untuk deffuzifikasi
     private function nilaiKeanggotaan($komposisi_aturan)
     {
         $variabel_fuzzy = DB::table('tbl_range_fuzzy')->get();
@@ -171,20 +193,21 @@ class FuzzyController extends Controller
         return $nilai_keanggotaan;
     }
 
-    // ! Defuzzifikasi
+    // ! Fungsi Deffuzifikasi
     private function defuzzifikasi($nilai_keanggotaan)
     {
         $a1 = $nilai_keanggotaan["a1"];
         $a2 = $nilai_keanggotaan["a2"];
-        $output = ((($a2 - $a1 + 1) * ($a1 + $a2)) / 2) / ($a2 - $a1 + 1);
+        // Menggunakan rumus MoM (Mean Of Maximum)
+        $output = ((($a1 - $a2 + 1) * ($a1 + $a2)) / 2) / ($a1 - $a2 + 1);
         if ($output == 1) {
-            $defuzzifikasi = ["Aman", $output];
+            $deffuzifikasi = ["Aman", $output];
         } else if ($output == 2) {
-            $defuzzifikasi = ["Waspada", $output];
+            $deffuzifikasi = ["Waspada", $output];
         } else if ($output == 3) {
-            $defuzzifikasi = ["Bahaya", $output];
+            $deffuzifikasi = ["Bahaya", $output];
         }
-        return $defuzzifikasi;
+        return $deffuzifikasi;
     }
 
     // ! Main function fuzzy mamdani

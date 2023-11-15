@@ -71,6 +71,21 @@ class RealTimeMonitoring extends Command
             return ($b - $x) / ($b - $a);
         }
     }
+    // ? Fungsi keanggotaan linear turun
+    private function fTrapesium($x, $a, $b, $c, $d)
+    {
+        if ($x >= $b && $x <= $c) {
+            return 1;
+        } elseif ($x <= $a && $x >= $d) {
+            return 0;
+        } elseif ($x >= $a && $x <= $b) {
+            return ($x-$a)/($b-$a);
+        } elseif ($x >= $c && $x <= $d) {
+            return ($d-$x)/($d-$c);
+        } elseif ($x <= $b ) {
+            return 0;
+        } 
+    }
 
     // ! Fungsi Fuzzifikasi
     private function fuzzifikasi($data_amonia, $data_metana)
@@ -79,12 +94,12 @@ class RealTimeMonitoring extends Command
         // ? Menghitung derajat keanggotaan
         $derajat_keanggotaan = array(
             "Amonia" => array(
-                "Rendah" => $this->fSegitiga(
-                    $data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"], $variabel_fuzzy[0]["c"]),
-                "Normal" => $this->fSegitiga(
-                    $data_amonia, $variabel_fuzzy[1]["a"], $variabel_fuzzy[1]["b"], $variabel_fuzzy[1]["c"]),
-                "Tinggi" => $this->fSegitiga(
-                    $data_amonia, $variabel_fuzzy[2]["a"], $variabel_fuzzy[2]["b"], $variabel_fuzzy[2]["c"]),
+                "Normal" => $this->fLinearTurun(
+                    $data_amonia, $variabel_fuzzy[0]["a"], $variabel_fuzzy[0]["b"]),
+                "Sedang" => $this->fTrapesium(
+                    $data_amonia, $variabel_fuzzy[1]["a"], $variabel_fuzzy[1]["b"], $variabel_fuzzy[1]["c"], $variabel_fuzzy[1]["d"]),
+                "Tinggi" => $this->fLinearNaik(
+                    $data_amonia, $variabel_fuzzy[2]["a"], $variabel_fuzzy[2]["b"]),
             ),
             "Metana" => array(
                 "Rendah" => $this->fLinearTurun(
@@ -104,7 +119,7 @@ class RealTimeMonitoring extends Command
         $aturanFuzzy = DB::table("tbl_aturan_fuzzy")->get();
         $alpa_predikat = array();
         foreach ($aturanFuzzy as $item) {
-            // Menentukan Alpa Predikat menggunakan metode Min
+            // Menentukan Alpa Predikat menggunakan metode Min berdasarkan aturan fuzzy
             array_push(
                 $alpa_predikat,
                 min($derajat_keanggotaan["Amonia"][$item->variabel1], $derajat_keanggotaan["Metana"][$item->variabel2])
