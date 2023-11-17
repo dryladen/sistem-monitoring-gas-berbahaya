@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/riwayat_monitoring', [HomeController::class, 'riwayat_monitoring']);
     // Fuzzy (Uji coba perhitungan)
     Route::get('/fuzzy', [FuzzyController::class, 'index']);
+    Route::get('/hitungUlang', [FuzzyController::class, 'hitungUlangKondisi'])->name('hitungUlang');
     // Setting profike
     Route::get('/profile',[UserController::class,'profile']);
     Route::post('/profile/updateProfile/{id}',[UserController::class,'updateProfile']);

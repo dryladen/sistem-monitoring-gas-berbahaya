@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AturanFuzzy;
 use App\Models\DataFuzzy;
 use App\Models\DataGas;
+use App\Models\RangeFuzzy;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +17,12 @@ class FuzzyController extends Controller
     {
         $data = array(
             "title" => "Himpunan Fuzzy",
-            "data_fuzzy" => DataFuzzy::join("tbl_variabel_fuzzy", "tbl_variabel_fuzzy.id", "=", "tbl_range_fuzzy.id")->select("tbl_range_fuzzy.*", "tbl_variabel_fuzzy.variabel")->get(),
+            "data_fuzzy" => RangeFuzzy::join("tbl_variabel_fuzzy", "tbl_variabel_fuzzy.id", "=", "tbl_range_fuzzy.id")->select("tbl_range_fuzzy.*", "tbl_variabel_fuzzy.variabel")->get(),
             "aturan_fuzzy" => AturanFuzzy::all(),
             'user' => Auth::user()->name,
             "amonia" => $this->getData()['amonia'],
-            "metana" => $this->getData()['metana'],
-            "fuzzy_mamdani" => $this->fuzzyMamdani($this->getData()['amonia'], $this->getData()['metana'])
+            "metana" => $this->getData()['amonia'],
+            "fuzzy_mamdani" => $this->fuzzyMamdani($this->getData()['amonia'], $this->getData()['amonia'])
         );
         return view('fuzzy', $data);
     }
@@ -33,11 +34,29 @@ class FuzzyController extends Controller
         $dataJson = json_decode($response, true);
         return json_decode($dataJson['m2m:cin']['con'], true);
     }
+
+    public function hitungUlangKondisi()
+    {
+        $dataGas = DataFuzzy::all();
+        foreach ($dataGas as $data) {
+            $nilai_kondisi = $this->fuzzyMamdani($data->gas_amonia, $data->gas_metana);
+            DataFuzzy::where('id', $data->id)->where('id',$data->id)->update([
+                'komposisi_aman' => $nilai_kondisi['komposisi_aturan'][0],
+                'komposisi_waspada' => $nilai_kondisi['komposisi_aturan'][1],
+                'komposisi_bahaya' => $nilai_kondisi['komposisi_aturan'][2],
+                'nilai_a1' => $nilai_kondisi['nilai_keanggotaan']['a1'],
+                'nilai_a2' => $nilai_kondisi['nilai_keanggotaan']['a2'],
+                'output_deff' => $nilai_kondisi['output'][1],
+                'kondisi' => $nilai_kondisi['output'][0]
+            ]);
+        }
+        return redirect('/riwayat_monitoring');
+    }
     public function dataGas()
     {
         // Mengambil 10 data terakhir
-        $dataGas = DataGas::latest()->take(10)->get()->sortBy('id');
-        $dataGas_last = DataGas::latest()->first();
+        $dataGas = DataFuzzy::latest()->take(10)->get()->sortBy('id');
+        $dataGas_last = DataFuzzy::latest()->first();
         $dates = $dataGas->pluck('created_at');
         $labels = [];
         // Konversi waktu dalam bentuk (Jam:Menit)
@@ -100,21 +119,21 @@ class FuzzyController extends Controller
     {
         if ($x >= $b && $x <= $c) {
             return 1;
-        } elseif ($x <= $a && $x >= $d) {
+        } elseif ($x < $a && $x > $d) {
             return 0;
         } elseif ($x >= $a && $x <= $b) {
             return ($x-$a)/($b-$a);
         } elseif ($x >= $c && $x <= $d) {
             return ($d-$x)/($d-$c);
-        } elseif ($x <= $b ) {
+        } else {
             return 0;
-        } 
+        }
     }
 
     // ! Fungsi Fuzzifikasi
     private function fuzzifikasi($data_amonia, $data_metana)
     {
-        $variabel_fuzzy = DataFuzzy::all();
+        $variabel_fuzzy = RangeFuzzy::all();
         // ? Menghitung derajat keanggotaan
         $derajat_keanggotaan = array(
             "Amonia" => array(
@@ -138,8 +157,7 @@ class FuzzyController extends Controller
     }
 
     // ! Fungsi Implikasi
-    private function fungsiImplikasi($derajat_keanggotaan)
-    {
+    private function fungsiImplikasi($derajat_keanggotaan) {
         $aturanFuzzy = DB::table("tbl_aturan_fuzzy")->get();
         $alpa_predikat = array();
         foreach ($aturanFuzzy as $item) {
@@ -153,12 +171,11 @@ class FuzzyController extends Controller
     }
 
     // ! Fungsi Komposisi Aturan 
-    private function komposisiAturan($alpa_predikat)
-    {
+    private function komposisiAturan($alpa_predikat) {
         $komposisi_aturan = array();
         array_push($komposisi_aturan, max($alpa_predikat[0], $alpa_predikat[1], $alpa_predikat[3]));
-        array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[5]));
-        array_push($komposisi_aturan, max($alpa_predikat[6], $alpa_predikat[7], $alpa_predikat[8]));
+        array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[6]));
+        array_push($komposisi_aturan, max($alpa_predikat[5], $alpa_predikat[7], $alpa_predikat[8]));
 
         // Menentukan komposisi aturan dengan menggunakan metode Max
         if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] > $komposisi_aturan[2]) {
@@ -194,7 +211,7 @@ class FuzzyController extends Controller
     }
 
     // ! Fungsi Deffuzifikasi
-    private function defuzzifikasi($nilai_keanggotaan)
+    private function deffuzifikasi($nilai_keanggotaan)
     {
         $a1 = $nilai_keanggotaan["a1"];
         $a2 = $nilai_keanggotaan["a2"];
@@ -210,7 +227,6 @@ class FuzzyController extends Controller
         return $deffuzifikasi;
     }
 
-    // ! Main function fuzzy mamdani
     private function fuzzyMamdani($data_amonia, $data_metana)
     {
         // Fuzzifikasi
@@ -222,7 +238,7 @@ class FuzzyController extends Controller
         // mencari a1 dan a2
         $nilai_keanggotaan = $this->nilaiKeanggotaan($komposisi_aturan);
         // Deffuzifikasi
-        $defuzzifikasi = $this->defuzzifikasi($nilai_keanggotaan);
+        $deffuzifikasi = $this->deffuzifikasi($nilai_keanggotaan);
 
         $FuzzyMamdani = array(
             'data_amonia' => $data_amonia,
@@ -231,9 +247,8 @@ class FuzzyController extends Controller
             'alpa_predikat' => $alpa_predikat,
             'komposisi_aturan' => $komposisi_aturan,
             'nilai_keanggotaan' => $nilai_keanggotaan,
-            'output' => $defuzzifikasi
+            'output' => $deffuzifikasi
         );
-        
         return $FuzzyMamdani;
     }
 }

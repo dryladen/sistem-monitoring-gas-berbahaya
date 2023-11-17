@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataFuzzy;
 use App\Models\DataGas;
 use App\Models\OutputFuzzy;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class HomeController extends Controller
         $data = array(
             'title' => 'Riwayat Monitoring',
             'user' => Auth::user()->name,
-            'data_gas' => OutputFuzzy::all(),
+            'data_gas' => DataFuzzy::all(),
         );
         return view('riwayat_monitoring', $data);
     }

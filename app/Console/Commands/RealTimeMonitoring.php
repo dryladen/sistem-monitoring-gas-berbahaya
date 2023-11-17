@@ -3,8 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DataFuzzy;
-use App\Models\OutputFuzzy;
-use Exception;
+use App\Models\RangeFuzzy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -76,21 +75,19 @@ class RealTimeMonitoring extends Command
     {
         if ($x >= $b && $x <= $c) {
             return 1;
-        } elseif ($x <= $a && $x >= $d) {
+        } elseif ($x < $a && $x > $d) {
             return 0;
         } elseif ($x >= $a && $x <= $b) {
             return ($x-$a)/($b-$a);
         } elseif ($x >= $c && $x <= $d) {
             return ($d-$x)/($d-$c);
-        } elseif ($x <= $b ) {
-            return 0;
         } 
     }
 
     // ! Fungsi Fuzzifikasi
     private function fuzzifikasi($data_amonia, $data_metana)
     {
-        $variabel_fuzzy = DataFuzzy::all();
+        $variabel_fuzzy = RangeFuzzy::all();
         // ? Menghitung derajat keanggotaan
         $derajat_keanggotaan = array(
             "Amonia" => array(
@@ -114,8 +111,7 @@ class RealTimeMonitoring extends Command
     }
 
     // ! Fungsi Implikasi
-    private function fungsiImplikasi($derajat_keanggotaan)
-    {
+    private function fungsiImplikasi($derajat_keanggotaan) {
         $aturanFuzzy = DB::table("tbl_aturan_fuzzy")->get();
         $alpa_predikat = array();
         foreach ($aturanFuzzy as $item) {
@@ -129,12 +125,11 @@ class RealTimeMonitoring extends Command
     }
 
     // ! Fungsi Komposisi Aturan 
-    private function komposisiAturan($alpa_predikat)
-    {
+    private function komposisiAturan($alpa_predikat) {
         $komposisi_aturan = array();
         array_push($komposisi_aturan, max($alpa_predikat[0], $alpa_predikat[1], $alpa_predikat[3]));
-        array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[5]));
-        array_push($komposisi_aturan, max($alpa_predikat[6], $alpa_predikat[7], $alpa_predikat[8]));
+        array_push($komposisi_aturan, max($alpa_predikat[2], $alpa_predikat[4], $alpa_predikat[6]));
+        array_push($komposisi_aturan, max($alpa_predikat[5], $alpa_predikat[7], $alpa_predikat[8]));
 
         // Menentukan komposisi aturan dengan menggunakan metode Max
         if ($komposisi_aturan[0] > $komposisi_aturan[1] && $komposisi_aturan[0] > $komposisi_aturan[2]) {
@@ -223,16 +218,12 @@ class RealTimeMonitoring extends Command
         //Mengambil data dari API
         $amonia = $this->getData()['amonia'];
         $metana = $this->getData()['metana'];
-        DB::table('tbl_data_gas')->insert([
-            'gas_amonia' => $amonia,
-            'gas_metana' => $metana,
-        ]);
         // Cmd run schedul : php artisan schedule:work
         // Ini masih bermasalah menyimpan data ke database
         // ! Perhitungan Fuzzy
         $dataFuzzy = $this->fuzzyMamdani($amonia, $metana);
         //  ! Menyimpan Perhitungan ke Database
-        OutputFuzzy::create([
+        DataFuzzy::create([
             'gas_amonia' => $amonia,
             'gas_metana' => $metana,
             'komposisi_aman' => $dataFuzzy['komposisi_aturan'][0],

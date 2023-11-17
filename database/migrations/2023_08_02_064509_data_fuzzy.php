@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_hitung_fuzzy', function (Blueprint $table) {
+        Schema::create('tbl_data_fuzzy', function (Blueprint $table) {
             $table->id();
             $table->float('gas_amonia')->nullable();
             $table->float('gas_metana')->nullable();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_hitung_fuzzy');
+        Schema::dropIfExists('tbl_data_fuzzy');
     }
 };
