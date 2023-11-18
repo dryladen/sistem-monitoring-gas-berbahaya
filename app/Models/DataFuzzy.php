@@ -9,7 +9,7 @@ class DataFuzzy extends Model
 {
     use HasFactory;
 
-    protected $table = 'tbl_data_fuzzy';
+    protected $table = 'tbl_hitung_fuzzy';
 
     protected $fillable = [
         'id',

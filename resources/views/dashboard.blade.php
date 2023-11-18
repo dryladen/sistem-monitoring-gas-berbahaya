@@ -20,7 +20,7 @@
                 <div class="row m-sm-2 m-lg-0 m-1">
                     <div class="col-sm col-md-4">
                         <div class="card card-widget">
-                            <div class="card-body gradient-9 p-md-3">
+                            <div class="card-body bg-blue p-md-3">
                                 <div class="media d-flex justify-content-center align-items-center">
                                     <span class="card-widget__icon"><i class="icon-fire"></i></span>
                                     <div class="media-body">
@@ -33,7 +33,7 @@
                     </div>
                     <div class="col-sm col-md-4">
                         <div class="card card-widget">
-                            <div class="card-body gradient-5 p-md-3">
+                            <div class="card-body bg-orange p-md-3">
                                 <div class="media d-flex justify-content-center align-items-center">
                                     <span class="card-widget__icon "><i class="icon-fire"></i></span>
                                     <div class="media-body">
@@ -46,7 +46,7 @@
                     </div>
                     <div class="col-sm col-md-4">
                         <div class="card card-widget">
-                            <div class="card-body gradient-4 p-md-3">
+                            <div id="card-kondisi" class="card-body bg-red p-md-3">
                                 <div class="media d-flex justify-content-center align-items-center">
                                     <span class="card-widget__icon"><i class="icon-home"></i></span>
                                     <div class="media-body">
@@ -64,12 +64,14 @@
 @endsection
 @section('scripts')
     @parent
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
     <script>
         var ctx = document.getElementById("myChart");
         var nilai_amonia = document.getElementById("nilai_amonia");
         var nilai_metana = document.getElementById("nilai_metana");
         var nilai_kondisi = document.getElementById("nilai_kondisi");
+        var card_kondisi = document.getElementById("card-kondisi");
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -78,15 +80,15 @@
                     label: 'Amonia',
                     data: [],
                     borderColor: '#36A2EB',
-                    backgroundColor: '#9BD0F5',
-                    borderWidth: 1,
+                    backgroundColor: '#2F64FD10',
+                    borderWidth: 2,
 
                 }, {
                     label: 'Metana',
                     data: [],
                     borderColor: '#FF6384',
-                    backgroundColor: '#eb8628',
-                    borderWidth: 1,
+                    backgroundColor: '#eb862810',
+                    borderWidth: 2,
                 }]
             },
             options: {
@@ -119,6 +121,13 @@
                     nilai_metana.innerHTML = data.nilai_last_metana + " PPM";
                     nilai_amonia.innerHTML = data.nilai_last_amonia + " PPM";
                     nilai_kondisi.innerHTML = data.nilai_kondisi['output'][0];
+                    if (data.nilai_kondisi['output'][0] == "Aman") {
+                        card_kondisi.style.backgroundColor = "#32CD32"
+                    } else if (data.nilai_kondisi['output'][0] == "Waspada") {
+                        card_kondisi.style.backgroundColor = "#FFC300"
+                    } else if (data.nilai_kondisi['output'][0] == "Bahaya") {
+                        card_kondisi.style.backgroundColor = "#FF0000"
+                    }
                 },
                 error: function(data) {
                     console.log('Data tidak terkirim')
@@ -130,5 +139,9 @@
         setInterval(() => {
             updateChart();
         }, 10000);
+    </script>
+    <script>
+        // mengubah warna background sesuai kondisi
+        var nilai_kondisi = document.getElementById("nilai_kondisi");
     </script>
 @endsection

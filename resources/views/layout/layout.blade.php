@@ -164,7 +164,6 @@
     <script src="/assets/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
     <script src="/assets/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
     <script src="/assets/plugins/chart.js/Chart.bundle.min.js"></script>
-    {{-- <script src="/assets/js/plugins-init/chartjs-init.js"></script> --}}
 
     @if (session('success'))
         <script>

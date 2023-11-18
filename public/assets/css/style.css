@@ -4480,6 +4480,22 @@ button.close {
   background-image: url("/assets/images/Ayam-Dikandang.jpg");
   background-size: cover;
 }
+
+.bg-blue {
+  background-color: #2F64FD;
+}
+.bg-orange {
+  background-color: #eb8628;
+}
+.bg-green {
+  background-color: #32CD32;
+}
+.bg-yellow {
+  background-color: #FFC300;
+}
+.bg-red {
+  background-color: #FF0000;
+}
 a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus {
